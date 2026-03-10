@@ -1,0 +1,157 @@
+# Health Assist Backend Service API Routes
+
+Base URL: `http://localhost:5000/api`
+
+## Main Routes
+1. GET `/`
+   - Description: Root endpoint to check if service is running
+   - Response: `{"message": "Health Chatbot Backend is running ✅"}`
+
+2. GET `/health`
+   - Description: Health check endpoint
+   - Response: `{"status": "ok"}`
+
+## Authentication Routes (`/auth`)
+1. POST `/auth/register`
+   - Description: Register a new user (local authentication)
+   - Protected: No
+   - Request Body:
+     ```json
+     {
+       "name": "John Doe",
+       "email": "john@example.com",
+       "password": "mypassword123",
+       "auth_provider": "local"
+     }
+     ```
+
+2. POST `/auth/login`
+   - Description: Login with email and password
+   - Protected: No
+   - Request Body:
+     ```json
+     {
+       "email": "john@example.com",
+       "password": "mypassword123"
+     }
+     ```
+   - Returns: JWT token and user details
+
+3. POST `/auth/google`
+   - Description: Google OAuth authentication
+   - Protected: No
+   - Request Body:
+     ```json
+     {
+       "email": "user@gmail.com",
+       "name": "User Name"
+     }
+     ```
+
+## User Routes (`/user`)
+1. POST `/user/register`
+   - Description: Alternative registration endpoint
+   - Protected: No
+   - Same as `/auth/register`
+
+2. GET `/user/profile`
+   - Description: Get user profile information
+   - Protected: Yes (JWT)
+   - Returns: User profile details
+
+3. PUT `/user/profile`
+   - Description: Update user profile
+   - Protected: Yes (JWT)
+   - Request Body (all fields optional):
+     ```json
+     {
+       "name": "New Name",
+       "password": "newpassword123"
+     }
+     ```
+
+## Chat Routes (`/chat`)
+1. GET `/chat/test-ml`
+   - Description: Test ML model connection
+   - Protected: No
+   - Tests connection to ML service
+
+2. GET `/chat/history`
+   - Description: Get user's chat history
+   - Protected: Yes (JWT)
+   - Query Params: 
+     - `archived=true` (optional) - include archived chats
+
+3. POST `/chat/create`
+   - Description: Create a new chat session
+   - Protected: Yes (JWT)
+   - Returns: Chat ID and shareable link
+
+4. POST `/chat/<chat_id>/message`
+   - Description: Add a message to chat
+   - Protected: Yes (JWT)
+   - Request Body:
+     ```json
+     {
+       "text": "User message"
+     }
+     ```
+
+5. GET `/chat/<chat_id>`
+   - Description: Get specific chat details
+   - Protected: Yes (JWT)
+
+6. DELETE `/chat/<chat_id>`
+   - Description: Delete a chat
+   - Protected: Yes (JWT)
+
+7. POST `/chat/<chat_id>/archive`
+   - Description: Archive a chat
+   - Protected: Yes (JWT)
+
+8. POST `/chat/<chat_id>/unarchive`
+   - Description: Unarchive a chat
+   - Protected: Yes (JWT)
+
+9. GET `/chat/user/<user_id>`
+   - Description: Get all chats for a specific user
+   - Protected: Yes (JWT)
+
+10. GET `/chat/share/<link>`
+    - Description: Access chat via shareable link
+    - Protected: No
+    - Public access to shared chats
+
+## Important Notes for Frontend Integration:
+1. Authentication:
+   - All protected routes require JWT token in Authorization header
+   - Format: `Bearer <token>`
+   - Token is obtained from `/auth/login` response
+
+2. Error Handling:
+   - 400: Bad Request (validation errors)
+   - 401: Unauthorized (invalid/missing token)
+   - 403: Forbidden (insufficient permissions)
+   - 404: Not Found
+   - 500: Server Error
+
+3. CORS:
+   - CORS is enabled for all origins in development
+   - Supports credentials
+
+4. Data Formats:
+   - All requests/responses use JSON
+   - Dates are in UTC format
+   - IDs are MongoDB ObjectIDs as strings
+
+5. Websockets:
+   - Currently not implemented
+   - Real-time updates require polling
+
+6. Rate Limiting:
+   - No rate limiting implemented yet
+   - Plan for reasonable request frequencies
+
+7. File Uploads:
+   - Not currently supported
+   - Text-only messages for now

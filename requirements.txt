@@ -1,0 +1,27 @@
+# Core
+Flask==2.3.2
+Werkzeug==2.3.6
+Flask-Cors==4.0.1
+
+# Database
+Flask-PyMongo==2.3.0
+pymongo==4.6.3
+
+# Authentication
+Flask-JWT-Extended==4.5.3
+Authlib==1.2.1   # For Google OAuth
+
+# Environment variables
+python-dotenv==1.0.1
+
+# For making HTTP requests to ML model
+requests==2.31.0
+
+# Production server
+gunicorn==22.0.0
+
+# For data validation (optional, good practice)
+marshmallow==3.21.1
+
+# Testing
+pytest==8.2.0
