@@ -19,6 +19,7 @@ class BaseConfig:
     PROPAGATE_EXCEPTIONS = True
 
     MONGO_URI = os.getenv("MONGO_URI", "mongodb://localhost:27017/healthchatbot")
+    MONGO_DB_NAME = os.getenv("MONGO_DB_NAME", "healthchatbot")
 
     JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY", "change-me-too")
     JWT_ACCESS_TOKEN_EXPIRES = timedelta(hours=12)

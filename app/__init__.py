@@ -1,4 +1,5 @@
 import logging
+from urllib.parse import urlsplit, urlunsplit
 
 from flask import Flask
 from .config import get_config
@@ -31,6 +32,28 @@ def _parse_cors_origins(raw_origins):
     return [origin.strip() for origin in value.split(",") if origin.strip()]
 
 
+def _normalize_db_name(raw_name):
+    return str(raw_name or "").strip().strip("/")
+
+
+def _ensure_mongo_uri_database(raw_uri, fallback_db_name):
+    uri = (raw_uri or "").strip()
+    db_name = _normalize_db_name(fallback_db_name)
+
+    if not uri or not db_name:
+        return raw_uri, False
+
+    parsed = urlsplit(uri)
+    if parsed.scheme not in {"mongodb", "mongodb+srv"}:
+        return uri, False
+
+    if parsed.path and parsed.path.strip("/"):
+        return uri, False
+
+    normalized_uri = urlunsplit(parsed._replace(path=f"/{db_name}"))
+    return normalized_uri, normalized_uri != uri
+
+
 def _register_with_api_alias(app, blueprint, url_prefix):
     app.register_blueprint(blueprint, url_prefix=url_prefix)
     api_prefix = _normalized_api_prefix(app.config.get("API_PREFIX", "/api"))
@@ -48,6 +71,18 @@ def create_app():
     app = Flask(__name__)
 
     app.config.from_object(get_config())
+
+    normalized_mongo_uri, mongo_uri_changed = _ensure_mongo_uri_database(
+        app.config.get("MONGO_URI"),
+        app.config.get("MONGO_DB_NAME"),
+    )
+    if normalized_mongo_uri:
+        app.config["MONGO_URI"] = normalized_mongo_uri
+    if mongo_uri_changed:
+        app.logger.warning(
+            "MONGO_URI had no database name; defaulting to '%s'.",
+            app.config.get("MONGO_DB_NAME"),
+        )
 
     mongo.init_app(app)
     jwt.init_app(app)

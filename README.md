@@ -35,6 +35,7 @@ APP_ENV=development
 SECRET_KEY=change-me
 JWT_SECRET_KEY=change-me-too
 MONGO_URI=mongodb://localhost:27017/healthchatbot
+MONGO_DB_NAME=healthchatbot
 ML_MODEL_URL=http://localhost:7860/predict
 ML_MODEL_TIMEOUT=45
 API_PREFIX=/api
@@ -88,6 +89,7 @@ APP_ENV=production
 SECRET_KEY=<strong-secret>
 JWT_SECRET_KEY=<strong-secret>
 MONGO_URI=<mongodb-atlas-uri>
+MONGO_DB_NAME=healthchatbot
 ML_MODEL_URL=<public-ml-service-url>/predict
 ML_MODEL_TIMEOUT=45
 API_PREFIX=/api
@@ -96,3 +98,5 @@ SHARE_BASE_URL=<frontend-url>/share/
 CORS_ORIGINS=<frontend-url>
 PYTHONUNBUFFERED=1
 ```
+
+`MONGO_DB_NAME` is used as a fallback when `MONGO_URI` does not include a default database segment (for example `mongodb+srv://.../?appName=...`).
